@@ -35,7 +35,7 @@ GA_grid <- st_transform(GA_grid, crs("+proj=longlat +datum=WGS84 +ellps=WGS84 +t
 GA_ext <- raster::extent(GA_grid)
 
 ## Create raster with cell ids and clip to MZ EEZ raster
-GA_grid_rast <- raster::raster(x=GA_ext, crs=crs(GA_grid), res=10000)
+GA_grid_rast <- raster::raster(x=GA_ext, crs=crs(GA_grid), res=100000)
 
 ## Assign cell values
 values(GA_grid_rast) <- 1:ncell(GA_grid_rast) 
@@ -48,8 +48,8 @@ GA_grid_df <- rasterToPoints(GA_grid_rast) %>%
 plot(GA_grid_rast)
 
 ## Mask it to only include the EEZ
-mz_eez_rast <- mask(mz_eez_rast, mz_eez_sf)
-plot(mz_eez_rast)
+GA_grid_rast <- mask(GA_grid_rast, GA_grid)
+plot(GA_grid_rast)
 
 ## Let's save this cell id raster as tif file - hashtagged this out for now since the tif is too big
 writeRaster(mz_eez_rast, here('cleaned_data/mz_eez_rast.tif'), overwrite = TRUE)
