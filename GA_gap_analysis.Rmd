@@ -1,0 +1,61 @@
+---
+title: "GA_analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+### Load packages
+library(raster)
+library(tidyverse)
+library(sf)
+library(here)
+library(fasterize)
+library(stringr)
+library(janitor)
+library(prioritizr)
+library(rgdal)
+library(slam)
+library(tmap)
+library(gurobi)
+
+```
+
+Bring in the data
+```{r}
+
+#project area and planning units (grid of X km2)??
+
+GA_grid <- read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/Grid_2.shp"))
+st_crs(GA_grid)
+GA_grid <- st_transform(GA_grid, crs("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+## Use GA_grid to set extent for future rasters
+GA_ext <- raster::extent(GA_grid)
+
+## Create raster with cell ids and clip to MZ EEZ raster
+GA_grid_rast <- raster::raster(x=GA_ext, crs=crs(GA_grid), res=10000)
+
+## Assign cell values
+values(GA_grid_rast) <- 1:ncell(GA_grid_rast) 
+
+## Create data frame to check it out
+GA_grid_df <- rasterToPoints(GA_grid_rast) %>%
+  as.data.frame()
+
+## Plot to make sure it looks good
+plot(GA_grid_rast)
+
+## Mask it to only include the EEZ
+mz_eez_rast <- mask(mz_eez_rast, mz_eez_sf)
+plot(mz_eez_rast)
+
+## Let's save this cell id raster as tif file - hashtagged this out for now since the tif is too big
+writeRaster(mz_eez_rast, here('cleaned_data/mz_eez_rast.tif'), overwrite = TRUE)
+
+GA_area -> read_csv(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/data/area/strongholds/strong_v3/marine/strong_marine_table.csv"))%>%
+  clean_names()
+
+```
+
