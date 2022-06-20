@@ -18,24 +18,54 @@ library(prioritizr)
 library(rgdal)
 library(slam)
 library(tmap)
+library(s2)
 library(gurobi)
 
 ```
 
-Bring in the data
+Set up the GA grid and GA raster
 ```{r}
+
+#read in the project area raster
+GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/grid_2_rast"))
+
+plot(GA_rast)
+crs(GA_rast) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+crs(GA_rast)
+
+#############################
+#############################
+#############################
 
 #project area and planning units (grid of X km2)??
 
-GA_grid <- read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/Grid_2.shp"))
+GA_grid <- read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/Grid_2.shp")) %>% 
+  st_set_crs(4326)
+
 st_crs(GA_grid)
-GA_grid <- st_transform(GA_grid, crs("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+GA_grid <- sf::sf_use_s2(FALSE)
+
+  s2::s2_rebuild() %>% 
+  sf::st_as_sfc()
+
+####### NEED TO FIX using yer_object$geometry <- yer_object$geometry %>% s2::s2_rebuild() %>% sf::st_as_sfc() OR sf::sf_use_s2(FALSE)
+  
+## Add a buffer of 10 km to make sure cells on the outer edges of the EEZ are included
+GA_grid_buffer_sf <- sf::st_buffer(GA_grid, dist = 10000)
+
+
+## Create data frame from simple feature to see data more readily (not necessary, but helpful for larger sf)
+GA_grid_df <- GA_grid %>% as.data.frame() %>% select(-geometry)
 
 ## Use GA_grid to set extent for future rasters
 GA_ext <- raster::extent(GA_grid)
 
+
+########
+
 ## Create raster with cell ids and clip to MZ EEZ raster
-GA_grid_rast <- raster::raster(x=GA_ext, crs=crs(GA_grid), res=100000)
+GA_grid_rast <- raster::raster(x=GA_ext, crs=crs(GA_grid), res=10000)
 
 ## Assign cell values
 values(GA_grid_rast) <- 1:ncell(GA_grid_rast) 
@@ -47,7 +77,7 @@ GA_grid_df <- rasterToPoints(GA_grid_rast) %>%
 ## Plot to make sure it looks good
 plot(GA_grid_rast)
 
-## Mask it to only include the EEZ
+## Mask it to only include the project area
 GA_grid_rast <- mask(GA_grid_rast, GA_grid)
 plot(GA_grid_rast)
 
@@ -56,6 +86,16 @@ writeRaster(mz_eez_rast, here('cleaned_data/mz_eez_rast.tif'), overwrite = TRUE)
 
 GA_area -> read_csv(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/data/area/strongholds/strong_v3/marine/strong_marine_table.csv"))%>%
   clean_names()
+
+```
+
+```{r}
+
+#read in habitat data
+
+pa_rast <- 
+
+#read in species data
 
 ```
 
