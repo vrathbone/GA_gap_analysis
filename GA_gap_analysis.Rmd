@@ -30,6 +30,10 @@ Set up the GA grid and GA raster
 GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/grid_2_rast"))
 
 plot(GA_rast)
+proj4string(GA_rast) <- CRS("+proj=utm +zone=10+datum=WGS84")
+proj4string(GA_rast)
+plot(GA_rast)
+
 crs(GA_rast) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 crs(GA_rast)
 
