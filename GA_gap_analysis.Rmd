@@ -23,23 +23,71 @@ library(gurobi)
 
 ```
 
-Set up the GA grid and GA raster
+Set up the GA area as a raster and a simple features file
 ```{r}
 
+########################
 #read in the project area raster
-GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/grid_2_rast"))
+GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/grid_rast_84"))
 
 plot(GA_rast)
-proj4string(GA_rast) <- CRS("+proj=utm +zone=10+datum=WGS84")
-proj4string(GA_rast)
-plot(GA_rast)
-
-crs(GA_rast) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 crs(GA_rast)
+# proj4string(GA_rast) <- CRS("+proj=utm +zone=10+datum=WGS84")
+# proj4string(GA_rast)
+# crs(GA_rast) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+# crs(GA_rast)
+# plot(GA_rast)
 
-#############################
-#############################
-#############################
+
+#######################
+## Set up GA Area as a simple feature file and the extent file
+GA_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/Grid_2.shp"))
+
+## Check coordinate system
+st_crs(GA_sf)
+extent(GA_sf)
+
+## change the CRS to WGS 1984, and extent to lat/long instead of decimals
+GA_sf <- st_transform(GA_sf, crs = 4326)
+st_crs(GA_sf)
+extent(GA_sf)
+
+## Use Moz EEZ to set extent for future rasters
+GA_ext <- raster::extent(GA_sf)
+
+```
+
+ALT TBD Set up the GA area as a raster
+```{r}
+
+#################
+#HOLD ON DOING THESE NEXT STEPS
+#################
+
+## Create raster with cell ids and clip to MZ EEZ raster
+GA_rast <- raster::raster(x=GA_ext, crs=crs(GA_sf), res = )
+
+## Assign cell values
+values(GA_rast) <- 1:ncell(GA_rast) 
+
+## Create data frame to check it out
+GA_rast_df <- rasterToPoints(GA_rast) %>%
+  as.data.frame()
+
+## Plot to make sure it looks good
+plot(GA_rast)
+
+## Mask it to only include the EEZ
+GA_rast <- mask(GA_rast, GA_sf)
+plot(GA_rast)
+
+## Let's save this cell id raster as tif file - hashtagged this out for now since the tif is too big
+writeRaster(GA_rast, here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/GA_rast.tif"), overwrite = TRUE)
+
+```
+
+Different approach to GA raster 
+```{r}
 
 #project area and planning units (grid of X km2)??
 
@@ -66,40 +114,34 @@ GA_grid_df <- GA_grid %>% as.data.frame() %>% select(-geometry)
 GA_ext <- raster::extent(GA_grid)
 
 
-########
-
-## Create raster with cell ids and clip to MZ EEZ raster
-GA_grid_rast <- raster::raster(x=GA_ext, crs=crs(GA_grid), res=10000)
-
-## Assign cell values
-values(GA_grid_rast) <- 1:ncell(GA_grid_rast) 
-
-## Create data frame to check it out
-GA_grid_df <- rasterToPoints(GA_grid_rast) %>%
-  as.data.frame()
-
-## Plot to make sure it looks good
-plot(GA_grid_rast)
-
-## Mask it to only include the project area
-GA_grid_rast <- mask(GA_grid_rast, GA_grid)
-plot(GA_grid_rast)
-
-## Let's save this cell id raster as tif file - hashtagged this out for now since the tif is too big
-writeRaster(mz_eez_rast, here('cleaned_data/mz_eez_rast.tif'), overwrite = TRUE)
-
-GA_area -> read_csv(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/data/area/strongholds/strong_v3/marine/strong_marine_table.csv"))%>%
-  clean_names()
-
 ```
 
+Read in the conservation features, habitat and species
 ```{r}
 
-#read in habitat data
+#read in habitats
 
-pa_rast <- 
+pa_path <- 'C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WDPA_WDOECM_SA_Polyg_ALL_GAE'
+pa_shape <- list.files(pa_path, full.names = TRUE)
 
-#read in species data
+## Load shapefile as simple feature
+pa_sf <- sf::read_sf(pa_shape[6]) 
+
+## Check the CRS of the pa's and compare to the GA rast
+st_crs(GA_rast)
+st_crs(pa_sf)
+
+## Let's create a raster using the mz_rast and mask to the GA area
+pa <- fasterize::fasterize(pa_sf, GA_rast) %>%
+  mask(GA_sf)
+
+## Plot to see what it looks like
+plot(pa)
+
+# Looks good lets save as a tif
+writeRaster(pa, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WDPA_WDOECM_SA_Polyg_ALL_GAE/GA_pa.tif'), overwrite = TRUE)
+
+
 
 ```
 
