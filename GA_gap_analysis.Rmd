@@ -23,12 +23,13 @@ library(gurobi)
 
 ```
 
+1. Planning unit: 
 Set up the GA area as a raster and a simple features file
 ```{r}
 
 ########################
 #read in the project area raster
-GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/grid_rast_84"))
+GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/2_Grid/grid_rast_84/grid_rast_84.tif"))
 
 plot(GA_rast)
 crs(GA_rast)
@@ -41,7 +42,7 @@ crs(GA_rast)
 
 #######################
 ## Set up GA Area as a simple feature file and the extent file
-GA_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/2_Grid/Grid_2.shp"))
+GA_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/2_Grid/Grid_2.shp"))
 
 ## Check coordinate system
 st_crs(GA_sf)
@@ -57,6 +58,83 @@ GA_ext <- raster::extent(GA_sf)
 
 ```
 
+2. Conservation Features
+
+Protected Areas, MPAs
+```{r}
+
+#read in protected areas and existing MPAs
+
+pa_path <- 'C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WDPA_WDOECM_SA_Polyg_ALL_GAE'
+pa_shape <- list.files(pa_path, full.names = TRUE)
+
+## Load shapefile as simple feature
+pa_sf <- sf::read_sf(pa_shape[8]) 
+
+## Check the CRS of the pa's and compare to the GA rast
+st_crs(GA_rast)
+st_crs(pa_sf)
+
+## Let's create a raster using the mz_rast and mask to the GA area
+pa <- fasterize::fasterize(pa_sf, GA_rast) %>%
+  mask(GA_sf)
+
+## Plot to see what it looks like
+plot(pa)
+
+# Looks good lets save as a tif
+writeRaster(pa, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_pa.tif'), overwrite = TRUE)
+
+
+
+```
+
+Species data
+```{r}
+#read in species data
+#turtles
+
+
+#Green#
+green_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
+green_sf <- st_transform(green_sf, crs = 4326)
+st_crs(green_sf)
+green_sf
+plot(green_sf)
+
+green_rast = rasterize(green_sf, GA_rast, "diss", fun = max) %>% 
+  mask(GA_sf)
+
+plot(green_rast)
+
+writeRaster(green_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_green.tif'), overwrite = TRUE)
+
+########
+#loggerheads#
+green_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
+green_sf <- st_transform(green_sf, crs = 4326)
+st_crs(green_sf)
+green_sf
+plot(green_sf)
+
+green_rast = rasterize(green_sf, GA_rast, "diss", fun = max) %>% 
+  mask(GA_sf)
+
+plot(green_rast)
+
+writeRaster(green_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_green.tif'), overwrite = TRUE)
+
+
+
+```
+
+
+Habitat data
+
+3. 
+
+
+PARKING LOT
 ALT TBD Set up the GA area as a raster
 ```{r}
 
@@ -115,33 +193,3 @@ GA_ext <- raster::extent(GA_grid)
 
 
 ```
-
-Read in the conservation features, habitat and species
-```{r}
-
-#read in habitats
-
-pa_path <- 'C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WDPA_WDOECM_SA_Polyg_ALL_GAE'
-pa_shape <- list.files(pa_path, full.names = TRUE)
-
-## Load shapefile as simple feature
-pa_sf <- sf::read_sf(pa_shape[6]) 
-
-## Check the CRS of the pa's and compare to the GA rast
-st_crs(GA_rast)
-st_crs(pa_sf)
-
-## Let's create a raster using the mz_rast and mask to the GA area
-pa <- fasterize::fasterize(pa_sf, GA_rast) %>%
-  mask(GA_sf)
-
-## Plot to see what it looks like
-plot(pa)
-
-# Looks good lets save as a tif
-writeRaster(pa, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WDPA_WDOECM_SA_Polyg_ALL_GAE/GA_pa.tif'), overwrite = TRUE)
-
-
-
-```
-
