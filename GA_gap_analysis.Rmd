@@ -89,40 +89,99 @@ writeRaster(pa, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR file
 
 ```
 
-Species data
+Species data - TURTLES Occurrence and Nesting Data
 ```{r}
-#read in species data
-#turtles
 
+#Turtle Occurance data
+#ALL turtles: Olive, Green, Loggerhead, Hawksbill, Leatherback#
 
-#Green#
-green_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
-green_sf <- st_transform(green_sf, crs = 4326)
-st_crs(green_sf)
-green_sf
-plot(green_sf)
+turtle_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
+turtle_sf <- st_transform(turtle_sf, crs = 4326)
+st_crs(turtle_sf)
+turtle_sf
+plot(turtle_sf)
 
-green_rast = rasterize(green_sf, GA_rast, "diss", fun = max) %>% 
+turtle_rast = rasterize(turtle_sf, GA_rast, "diss", fun = max) %>% 
   mask(GA_sf)
 
-plot(green_rast)
+plot(turtle_rast)
 
-writeRaster(green_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_green.tif'), overwrite = TRUE)
+writeRaster(turtle_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_turtle_all.tif'), overwrite = TRUE)
 
-########
-#loggerheads#
-green_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
-green_sf <- st_transform(green_sf, crs = 4326)
-st_crs(green_sf)
-green_sf
-plot(green_sf)
+#################
+#Turtle Nesting Data
+#May 4, 2021
 
-green_rast = rasterize(green_sf, GA_rast, "diss", fun = max) %>% 
-  mask(GA_sf)
+nest_may_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/nest_may4_proj.shp"))
+nest_may_sf <- st_transform(nest_may_sf, crs = 4326)
+st_crs(nest_may_sf)
+nest_may_sf
+plot(nest_may_sf)
 
-plot(green_rast)
+nest_may_rast = rasterize(nest_may_sf, GA_rast, "diss", fun = max)
 
-writeRaster(green_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_green.tif'), overwrite = TRUE)
+plot(nest_may_rast)
+
+writeRaster(nest_may_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_nest_may.tif'), overwrite = TRUE)
+
+#April 24, 2021
+
+nest_april_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/nest_april24_proj.shp"))
+nest_april_sf <- st_transform(nest_april_sf, crs = 4326)
+st_crs(nest_april_sf)
+nest_april_sf
+plot(nest_april_sf)
+
+nest_april_rast = rasterize(nest_april_sf, GA_rast, "diss", fun = max)
+
+plot(nest_april_rast)
+
+writeRaster(nest_april_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_nest_april.tif'), overwrite = TRUE)
+
+#March 21, 2021
+
+nest_march_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/nest_mar21_proj.shp"))
+nest_march_sf <- st_transform(nest_march_sf, crs = 4326)
+st_crs(nest_march_sf)
+nest_march_sf
+plot(nest_march_sf)
+
+nest_march_rast = rasterize(nest_march_sf, GA_rast, "diss", fun = max)
+
+plot(nest_march_rast)
+
+writeRaster(nest_march_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_nest_march.tif'), overwrite = TRUE)
+
+
+# #Green#
+# green_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
+# green_sf <- st_transform(green_sf, crs = 4326)
+# st_crs(green_sf)
+# green_sf
+# plot(green_sf)
+# 
+# green_rast = rasterize(green_sf, GA_rast, "diss", fun = max) %>% 
+#   mask(GA_sf)
+# 
+# plot(green_rast)
+# 
+# writeRaster(green_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_green.tif'), overwrite = TRUE)
+# 
+# ########
+# #loggerheads#
+# logger_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/logger_proj.shp")) %>% 
+#   select(-c(Green, Hawksbill:Olive_Ridl))
+# logger_sf <- st_transform(logger_sf, crs = 4326)
+# st_crs(logger_sf)
+# logger_sf
+# plot(logger_sf)
+# 
+# logger_rast = rasterize(logger_sf, GA_rast, "diss", fun = max) %>% 
+#   mask(GA_sf)
+# 
+# plot(logger_rast)
+# 
+# writeRaster(logger_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_logger.tif'), overwrite = TRUE)
 
 
 
@@ -130,6 +189,24 @@ writeRaster(green_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles
 
 
 Habitat data
+```{r}
+
+
+turtle_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
+turtle_sf <- st_transform(turtle_sf, crs = 4326)
+st_crs(turtle_sf)
+turtle_sf
+plot(turtle_sf)
+
+turtle_rast = rasterize(turtle_sf, GA_rast, "diss", fun = max) %>% 
+  mask(GA_sf)
+
+plot(turtle_rast)
+
+writeRaster(turtle_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_turtle_all.tif'), overwrite = TRUE)
+
+```
+
 
 3. 
 
