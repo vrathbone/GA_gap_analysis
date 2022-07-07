@@ -191,19 +191,75 @@ writeRaster(nest_march_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Ant
 Habitat data
 ```{r}
 
+#mangroves
+mangrove_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Mangrove_watch/mangroves.shp"))
+mangrove_sf <- st_transform(mangrove_sf, crs = 4326)
+st_crs(mangrove_sf)
+mangrove_sf
+plot(mangrove_sf)
 
-turtle_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/turtles/Nesting Data Widecast/green_proj.shp"))
-turtle_sf <- st_transform(turtle_sf, crs = 4326)
-st_crs(turtle_sf)
-turtle_sf
-plot(turtle_sf)
+mangrove_rast = rasterize(mangrove_sf, GA_rast, "pxlval", fun = max)
 
-turtle_rast = rasterize(turtle_sf, GA_rast, "diss", fun = max) %>% 
-  mask(GA_sf)
+plot(mangrove_rast)
 
-plot(turtle_rast)
+writeRaster(mangrove_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_mangrove.tif'), overwrite = TRUE)
 
-writeRaster(turtle_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_turtle_all.tif'), overwrite = TRUE)
+#seagrasses
+
+seagrasses_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WCMC013014_Seagrasses_Py_v7_GAE/WCMC013014_Seagrasses_Py_v7_GAE.shp")) %>% 
+  mutate(diss = 1)
+seagrasses_sf <- st_transform(seagrasses_sf, crs = 4326)
+st_crs(seagrasses_sf)
+seagrasses_sf
+plot(seagrasses_sf)
+
+seagrasses_rast = rasterize(seagrasses_sf, GA_rast, "diss", fun = max)
+
+plot(seagrasses_rast)
+
+writeRaster(seagrasses_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_seagrasses.tif'), overwrite = TRUE)
+
+#saltmarshes
+saltmarsh_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WCMC027_Saltmarshes_Py_v6_GAE/WCMC027_Saltmarshes_Py_v6_GAE.shp")) %>% 
+  mutate(diss = 1)
+saltmarsh_sf <- st_transform(saltmarsh_sf, crs = 4326)
+st_crs(saltmarsh_sf)
+saltmarsh_sf
+plot(saltmarsh_sf)
+
+saltmarsh_rast = rasterize(saltmarsh_sf, GA_rast, "diss", fun = max)
+
+plot(saltmarsh_rast)
+
+writeRaster(saltmarsh_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_saltmarsh.tif'), overwrite = TRUE)
+
+#cold corals
+coldcoral_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Cold_Corals_2017_Pt_v5_Buffer500m_GAE/Cold_Corals_2017_Pt_v5_Buffer500m_GAE.shp")) %>% 
+  mutate(diss = 1)
+coldcoral_sf <- st_transform(coldcoral_sf, crs = 4326)
+st_crs(coldcoral_sf)
+coldcoral_sf
+plot(coldcoral_sf)
+
+coldcoral_rast = rasterize(coldcoral_sf, GA_rast, "diss", fun = max)
+
+plot(coldcoral_rast)
+
+writeRaster(coldcoral_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_coldcoral.tif'), overwrite = TRUE)
+
+#TNC mangroves and saltmarshes
+mansalt_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Mangroves_Saltmarshes_HerbazalesCienaga_Saladares_GAE_Ensemble/Mangroves_Saltmarshes_HerbazalesCienaga_Saladares_GAE_Ensemble.shp")) %>% 
+  mutate(diss = 1)
+mansalt_sf <- st_transform(mansalt_sf, crs = 4326)
+st_crs(mansalt_sf)
+mansalt_sf
+plot(mansalt_sf)
+
+mansalt_rast = rasterize(mansalt_sf, GA_rast, "diss", fun = max)
+
+plot(mansalt_rast)
+
+writeRaster(mansalt_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_mansalt.tif'), overwrite = TRUE)
 
 ```
 
