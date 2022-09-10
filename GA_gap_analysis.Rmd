@@ -388,20 +388,47 @@ plot(isobata_GEBCO_rast)
 writeRaster(isobata_GEBCO_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_isobata_GEBCO.tif'), overwrite = TRUE)
 
 
-#
-isobata_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Isobata0_TierraFirme_GAE/Isobata0_TierraFirme_GAE.shp")) %>% 
+#Geomorphology Features 
+geomorph_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Geology_Geomorphology_BiggestFeatures_GAE/Geology_Geomorphology_BiggestFeatures_GAE.shp")) %>%
   mutate(diss = 1)
-isobata_sf <- st_transform(isobata_sf, crs = 4326)
-st_crs(isobata_sf)
-isobata_sf
-plot(isobata_sf)
+geomorph_sf <- st_transform(geomorph_sf, crs = 4326)
+st_crs(geomorph_sf)
+geomorph_sf
+plot(geomorph_sf)
 
-isobata_rast = rasterize(isobata_sf, GA_rast, "diss", fun = max)
+geomorph_rast = rasterize(geomorph_sf, GA_rast, "diss", fun = max)
 
-plot(isobata_rast)
+plot(geomorph_rast)
 
-writeRaster(isobata_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_isobata.tif'), overwrite = TRUE)
+writeRaster(geomorph_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_geomorph_features.tif'), overwrite = TRUE)
 
+#plateaus 
+plateaus_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Plateaus_GAE/Plateaus_GAE.shp")) %>%
+  mutate(diss = 1)
+plateaus_sf <- st_transform(plateaus_sf, crs = 4326)
+st_crs(plateaus_sf)
+plateaus_sf
+plot(plateaus_sf)
+
+plateaus_rast = rasterize(plateaus_sf, GA_rast, "diss", fun = max)
+
+plot(plateaus_rast)
+
+writeRaster(plateaus_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_plateaus.tif'), overwrite = TRUE)
+
+#ridges
+ridges_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Ridges_GAE_2/Ridges_GAE_2.shp")) %>%
+  mutate(diss = 1)
+ridges_sf <- st_transform(ridges_sf, crs = 4326)
+st_crs(ridges_sf)
+ridges_sf
+plot(ridges_sf)
+
+ridges_rast = rasterize(ridges_sf, GA_rast, "diss", fun = max)
+
+plot(ridges_rast)
+
+writeRaster(ridges_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_ridges.tif'), overwrite = TRUE)
 
 
 ```
