@@ -430,6 +430,34 @@ plot(ridges_rast)
 
 writeRaster(ridges_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_ridges.tif'), overwrite = TRUE)
 
+#spreading ridges
+spreading_ridges_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/RiftValleys_SpreadingRidges_GAE/RiftValleys_SpreadingRidges_GAE.shp")) %>%
+  mutate(diss = 1)
+spreading_ridges_sf <- st_transform(spreading_ridges_sf, crs = 4326)
+st_crs(spreading_ridges_sf)
+spreading_ridges_sf
+plot(spreading_ridges_sf)
+
+spreading_ridges_rast = rasterize(spreading_ridges_sf, GA_rast, "diss", fun = max)
+
+plot(spreading_ridges_rast)
+
+writeRaster(spreading_ridges_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_spreading_ridges.tif'), overwrite = TRUE)
+
+#KGA features
+KGA_features_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/KGA_Features_GAE/KGA_Features_GAE.shp")) %>%
+  mutate(diss = 1)
+KGA_features_sf <- st_transform(KGA_features_sf, crs = 4326)
+st_crs(KGA_features_sf)
+KGA_features_sf
+plot(KGA_features_sf)
+
+KGA_features_rast = rasterize(KGA_features_sf, GA_rast, "diss", fun = max)
+
+plot(KGA_features_rast)
+
+writeRaster(KGA_features_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_KGA_features.tif'), overwrite = TRUE)
+
 
 ```
 
