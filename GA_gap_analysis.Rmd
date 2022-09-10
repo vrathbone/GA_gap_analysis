@@ -34,7 +34,7 @@ GA_rast <- raster(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR fi
 plot(GA_rast)
 crs(GA_rast)
 # proj4string(GA_rast) <- CRS("+proj=utm +zone=10+datum=WGS84")
-# proj4string(GA_rast)
+# proj4string(GA_rast) 
 # crs(GA_rast) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 # crs(GA_rast)
 # plot(GA_rast)
@@ -205,7 +205,6 @@ plot(mangrove_rast)
 writeRaster(mangrove_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_mangrove.tif'), overwrite = TRUE)
 
 #seagrasses
-
 seagrasses_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WCMC013014_Seagrasses_Py_v7_GAE/WCMC013014_Seagrasses_Py_v7_GAE.shp")) %>% 
   mutate(diss = 1)
 seagrasses_sf <- st_transform(seagrasses_sf, crs = 4326)
@@ -219,7 +218,7 @@ plot(seagrasses_rast)
 
 writeRaster(seagrasses_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_seagrasses.tif'), overwrite = TRUE)
 
-#saltmarshes
+#salt marshes
 saltmarsh_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WCMC027_Saltmarshes_Py_v6_GAE/WCMC027_Saltmarshes_Py_v6_GAE.shp")) %>% 
   mutate(diss = 1)
 saltmarsh_sf <- st_transform(saltmarsh_sf, crs = 4326)
@@ -247,6 +246,20 @@ plot(coldcoral_rast)
 
 writeRaster(coldcoral_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_coldcoral.tif'), overwrite = TRUE)
 
+#coral reefs TNC
+coral_TNC_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WCMC008_CoralReef2018_Py_v4_GAE/WCMC008_CoralReef2018_Py_v4_GAE.shp")) %>% 
+  mutate(diss = 1)
+coral_TNC_sf <- st_transform(coral_TNC_sf, crs = 4326)
+st_crs(coral_TNC_sf)
+coral_TNC_sf
+plot(coral_TNC_sf)
+
+coral_TNC_rast = rasterize(coral_TNC_sf, GA_rast, "diss", fun = max)
+
+plot(coral_TNC_rast)
+
+writeRaster(coral_TNC_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_coral_TNC.tif'), overwrite = TRUE)
+
 #TNC mangroves and saltmarshes
 mansalt_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Mangroves_Saltmarshes_HerbazalesCienaga_Saladares_GAE_Ensemble/Mangroves_Saltmarshes_HerbazalesCienaga_Saladares_GAE_Ensemble.shp")) %>% 
   mutate(diss = 1)
@@ -255,16 +268,144 @@ st_crs(mansalt_sf)
 mansalt_sf
 plot(mansalt_sf)
 
+
 mansalt_rast = rasterize(mansalt_sf, GA_rast, "diss", fun = max)
 
 plot(mansalt_rast)
 
 writeRaster(mansalt_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_mansalt.tif'), overwrite = TRUE)
 
+#mangroves - World Atlas of Mangroves
+man_WAM_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/WCMC011_AtlasMangrove2010_Py_v3_GAE/WCMC011_AtlasMangrove2010_Py_v3_GAE.shp")) %>% 
+  mutate(diss = 1)
+man_WAM_sf <- st_transform(man_WAM_sf, crs = 4326)
+st_crs(man_WAM_sf)
+man_WAM_sf
+plot(man_WAM_sf)
+
+man_WAM_rast = rasterize(man_WAM_sf, GA_rast, "diss", fun = max)
+
+plot(man_WAM_rast)
+
+writeRaster(man_WAM_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_man_WAM.tif'), overwrite = TRUE)
+
 ```
 
 
-3. 
+3. Geomorfological and geological features
+```{r}
+
+#Abyssal plain
+abyssal_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Abyssal_Plain_3300_4800_GAE/Abyssal_Plain_3300_4800_GAE.shp")) %>% 
+  mutate(diss = 1)
+abyssal_sf <- st_transform(abyssal_sf, crs = 4326)
+st_crs(abyssal_sf)
+abyssal_sf
+plot(abyssal_sf)
+
+abyssal_rast = rasterize(abyssal_sf, GA_rast, "diss", fun = max)
+
+plot(abyssal_rast)
+
+writeRaster(abyssal_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_abyssal.tif'), overwrite = TRUE)
+
+#Various coastal benthic TNC
+benthic_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/GAE_TNC_mar_benhab4m_2021_Diss7_GRASS_Diss/GAE_TNC_mar_benhab4m_2021_Diss7_GRASS_Diss_HG.shp")) %>% 
+  mutate(diss = 1)
+benthic_sf <- st_transform(benthic_sf, crs = 4326)
+st_crs(benthic_sf)
+benthic_sf
+plot(benthic_sf)
+
+benthic_rast = rasterize(benthic_sf, GA_rast, "diss", fun = max)
+
+plot(benthic_rast)
+
+writeRaster(benthic_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_benthic.tif'), overwrite = TRUE)
+
+#Insular shelf
+
+insular_shelf_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Insular_Shelf_GAE/Insular_Shelf_GAE.shp")) %>% 
+  mutate(diss = 1)
+insular_shelf_sf <- st_transform(insular_shelf_sf, crs = 4326)
+st_crs(insular_shelf_sf)
+insular_shelf_sf
+plot(insular_shelf_sf)
+
+insular_rast = rasterize(insular_shelf_sf, GA_rast, "diss", fun = max)
+
+plot(insular_rast)
+
+writeRaster(insular_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_insular_shelf.tif'), overwrite = TRUE)
+
+#Insular upper shelf
+insular_upper_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Insular_Upper_Shelf_Slope_Mesophotic_GAE/Insular_Upper_Shelf_Slope_Mesophotic_GAE.shp")) %>% 
+  mutate(diss = 1)
+insular_upper_sf <- st_transform(insular_upper_sf, crs = 4326)
+st_crs(insular_upper_sf)
+insular_upper_sf
+plot(insular_upper_sf)
+
+insular_upper_rast = rasterize(insular_upper_sf, GA_rast, "diss", fun = max)
+
+plot(insular_upper_rast)
+
+writeRaster(insular_upper_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_insular_upper.tif'), overwrite = TRUE)
+
+#Isobata 
+isobata_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Isobata0_TierraFirme_GAE/Isobata0_TierraFirme_GAE.shp")) %>% 
+  mutate(diss = 1)
+isobata_sf <- st_transform(isobata_sf, crs = 4326)
+st_crs(isobata_sf)
+isobata_sf
+plot(isobata_sf)
+
+isobata_rast = rasterize(isobata_sf, GA_rast, "diss", fun = max)
+
+plot(isobata_rast)
+
+writeRaster(isobata_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_isobata.tif'), overwrite = TRUE)
+
+
+###################
+####################
+#####################
+#####NEED TO LOOK AT REMOVING Z DIMENSIONA TO RASTERIZE#####
+#Isobata GEBCO
+
+isobata_GEBCO_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Gebco_2020_Caribe2_5m_isobata200_Clip_TM_World_Bordes_03_4/Gebco_2020_Caribe2_5m_isobata200_Clip_TM_World_Bordes_03_4.shp")) %>% 
+  mutate(diss = 1)
+isobata_GEBCO_sf <- st_transform(isobata_GEBCO_sf, crs = 4326)
+st_crs(isobata_GEBCO_sf)
+st_zm(isobata_GEBCO_sf)
+isobata_GEBCO_sf
+plot(isobata_GEBCO_sf)
+
+isobata_GEBCO_rast = rasterize(isobata_GEBCO_sf, GA_rast, "diss", fun = max)
+
+plot(isobata_GEBCO_rast)
+
+writeRaster(isobata_GEBCO_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_isobata_GEBCO.tif'), overwrite = TRUE)
+
+
+#
+isobata_sf <- sf::read_sf(here("C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/1_sources/Rey/Isobata0_TierraFirme_GAE/Isobata0_TierraFirme_GAE.shp")) %>% 
+  mutate(diss = 1)
+isobata_sf <- st_transform(isobata_sf, crs = 4326)
+st_crs(isobata_sf)
+isobata_sf
+plot(isobata_sf)
+
+isobata_rast = rasterize(isobata_sf, GA_rast, "diss", fun = max)
+
+plot(isobata_rast)
+
+writeRaster(isobata_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_isobata.tif'), overwrite = TRUE)
+
+
+
+```
+
 
 
 PARKING LOT
