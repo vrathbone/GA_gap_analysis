@@ -19,6 +19,7 @@ library(rgdal)
 library(slam)
 library(tmap)
 library(s2)
+library(slam)
 library(gurobi)
 
 ```
