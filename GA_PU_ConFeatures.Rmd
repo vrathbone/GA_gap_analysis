@@ -40,6 +40,9 @@ crs(GA_rast)
 # crs(GA_rast)
 # plot(GA_rast)
 
+#output files, planning unit as a raster with a 4326 crs
+writeRaster(GA_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_grid.tif'), overwrite = TRUE)
+
 
 #######################
 ## Set up GA Area as a simple feature file and the extent file
@@ -54,7 +57,7 @@ GA_sf <- st_transform(GA_sf, crs = 4326)
 st_crs(GA_sf)
 extent(GA_sf)
 
-## Use Moz EEZ to set extent for future rasters
+## Use GA EEZ to set extent for future rasters
 GA_ext <- raster::extent(GA_sf)
 
 ```
@@ -293,7 +296,7 @@ writeRaster(man_WAM_rast, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antill
 ```
 
 
-3. Geomorfological and geological features
+Geomorfological and geological features
 ```{r}
 
 #Abyssal plain

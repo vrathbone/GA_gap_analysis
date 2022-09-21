@@ -1,0 +1,185 @@
+---
+title: "analysis_baseline_area"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(raster)
+library(tidyverse)
+library(sf)
+library(here)
+library(fasterize)
+library(stringr)
+library(janitor)
+library(prioritizr)
+library(slam)
+
+```
+
+## Scenario 1 - Baseline
+The objective of this scenario was to identify important areas based on critical species data and distinct habitats and geomorphological features using a uniform cost for all planning units. For this run, we used area as the cost, set targets of 20% for all conservation features, locked in planning units that included existing MPAs, and set a boundary penalty to zero. 
+
+### STEP 1: Assign planning units, cost layer, and conservation feature
+
+#### Planning Unit
+```{r}
+###read in the planning unit 
+
+pu <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_grid.tif'))
+
+plot(pu)
+
+```
+
+#### Cost Layer
+Cost layer is using area as the cost to establish a baseline scenario.
+```{r}
+
+### pull in the initial MZ EEZ raster to start with
+GA_rast <-  raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_grid.tif'))
+
+### assign a uniform cost value of 0.5 to all cells since the area of the planning units are the same. 
+### We assigned a value of 0.5 since we will transform cost layers in future simulations to be between 0-1 and this 0.5 is a middle value in this range 
+values(GA_rast) <- 0.5
+
+### mask the area raster to just the MZ EEZ, so all cells outside the EEZ are assigned NA AND rename it to cost_area
+GA_area <- mask(GA_rast, pu)
+
+### check it by plotting!
+#plot(cost_area)
+
+plot(GA_area)
+
+### write raster
+writeRaster(GA_area, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_0.5.tif'), overwrite = TRUE)
+
+```
+
+#### Conservation Features
+This includes all species distributions and habitat rasters
+
+Creating Species Stack
+```{r}
+### create file path to read in all 30 species tifs in 
+species_path <- 'G:/group_project/future4fins/future4fins/set_up/final_rasters/conservation_features/iucn_species'
+species_files <- list.files(species_path, full.names = TRUE)
+
+### stack them 
+species_stack <-  stack(species_files)
+
+### plot to see how they look
+plot(species_stack)
+
+### write raster
+writeRaster(species_stack, here('set_up/final_rasters/species_stack.tif'), overwrite = TRUE)
+```
+
+Creating Conservation Features Stack
+```{r}
+### reading in all habitat, geomorphological and species rasters
+
+#####################
+#######habitat#######
+#####################
+mangroves_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_mangrove.tif'))
+seagrasses_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_seagrasses.tif'))
+saltmarsh_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_saltmarsh.tif'))
+coldcoral_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_coldcoral.tif'))
+coral_TNC_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_coral_TNC.tif'))
+mansalt_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_mansalt.tif'))
+man_WAM_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_man_WAM.tif'))
+
+habitat_stack <- stack(mangrove_rast, seagrasses_rast, saltmarsh_rast, coldcoral_rast, coral_TNC_rast, mansalt_rast, man_WAM_rast)
+
+plot(habitat_stack)
+
+### write raster
+writeRaster(habitat_stack, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_habitat_stack.tif'), overwrite = TRUE)
+
+
+
+############################
+#######Turtle data#######
+############################
+turtle_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_turtle_all.tif'))
+nest_may_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_nest_may.tif'))
+nest_april_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_nest_april.tif'))
+nest_march_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_nest_march.tif'))
+
+turtle_stack <- stack(turtle_rast, nest_may_rast, nest_april_rast, nest_march_rast)
+
+plot(turtle_stack)
+
+### write raster
+writeRaster(turtle_stack, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_turtle_stack.tif'), overwrite = TRUE)
+
+
+
+##########################################
+#######geomorphological features#######
+##########################################
+abyssal_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_abyssal.tif'))
+insular_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_insular_shelf.tif'))
+insular_upper_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_insular_upper.tif'))
+isobata_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_isobata.tif'))
+geomorph_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_geomorph_features.tif'))
+plateaus_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_plateaus.tif'))
+ridges_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_ridges.tif'))
+spreading_ridges_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_spreading_ridges.tif'))
+KGA_features_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_KGA_features.tif'))
+
+geomorph_stack <- stack(abyssal_rast, insular_rast, insular_upper_rast, isobata_rast, geomorph_rast, plateaus_rast, ridges_rast, spreading_ridges_rast, KGA_features_rast)
+
+plot(geomorph_stack)
+
+### write raster
+writeRaster(geomorph_stack, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_geomorph_stack.tif'), overwrite = TRUE)
+
+
+```
+
+Creating Final Conservation Feature 
+```{r}
+### stack all species and habitat
+features_stack <- stack(habitat_stack,turtle_stack, geomorph_stack)
+
+### change into a dataframe to check it
+features_df <- as.data.frame(features_stack)
+
+### write raster
+writeRaster(features_stack, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_features_stack.tif'),options="INTERLEAVE=BAND", overwrite = TRUE)
+```
+
+### Additional Files (Locked-in & Locked-out)
+```{r}
+### read in existing protected areas raster
+pa_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_pa.tif'))
+
+plot(pa_rast)
+
+```
+
+## SCENARIO 1: Baseline - 20% target, Boundary Penalty = 0 
+```{r}
+### OBJECTIVE: Minimize area while meeting 20% representation targets, locking out PAs and a boundary penalty of 0
+
+## Define the problem with the cost, conservation features, targets, locked in and locked out constraints using the minimum set objective
+
+area_20 <- problem(GA_area, features = features_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.2) %>%
+  add_locked_out_constraints(pa_rast) %>%
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area <- solve(prob_area)
+
+## Plot the solution to see what it looks like
+plot(sprob_area,  main = c("Area- 20% Targets"))
+
+
+```
+
