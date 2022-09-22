@@ -20,6 +20,20 @@ library(gurobi)
 library(spatstat)
 library(maptools)
 library(rgdal)
+library(terra)
+library(rgeos)
+
+```
+
+
+```{r}
+#close and rerun all of the rasters individually
+#check all layers in the geomorph stacks to get rid of the lines
+#remove any line rasters
+#rerun geomorph and all analyses
+#resave as tifs 
+#save out as pngs
+#add to report
 
 ```
 
@@ -35,6 +49,16 @@ The objective of this scenario was to identify important areas based on critical
 pu <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_grid.tif'))
 
 plot(pu)
+
+#get the boundary of the area
+#make all values the same
+r <- pu > -Inf
+# convert to polygons (you need to have package 'rgeos' installed for this to work)
+GA_polygon <- rasterToPolygons(r, dissolve=TRUE)
+plot(GA_polygon)
+
+writeOGR(GA_polygon, dsn = here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_area_outline.shp'), layer = 'poly', driver = "ESRI Shapefile")
+
 
 ```
 
@@ -64,11 +88,6 @@ writeRaster(GA_area, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR
 GA_area_image <- as.im(GA_area)
 plot(GA_area_image)
 
-GA_area_polygon <- rasterToPolygons(GA_area, fun=function(x){x==0.5})
-
-plot(GA_area_polygon)
-
-writeOGR(GA_area_polygon, dsn = here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_area_polygon.shp'), layer = 'poly', driver = "ESRI Shapefile")
 
 ```
 
@@ -145,8 +164,7 @@ ridges_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/V
 spreading_ridges_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_spreading_ridges.tif'))
 
 #KGA_features_rast <- raster(here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_KGA_features.tif'))
-
-geomorph_stack <- stack(abyssal_rast, insular_upper_rast, isobata_rast, geomorph_rast, plateaus_rast, ridges_rast, spreading_ridges_rast)
+geomorph_stack <- stack(abyssal_rast, isobata_rast, plateaus_rast, ridges_rast, spreading_ridges_rast)
 
 plot(geomorph_stack)
 
@@ -231,7 +249,7 @@ plot(sprob_area_geomorph_10,  main = c("Area- 10% Geomorphological Targets"))
 
 writeRaster(sprob_area_geomorph_10, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/geomorph_area_10.tif'), overwrite = TRUE)
 
-####### All features 80% ####### 
+####### All features 10% ####### 
 area_all_10 <- problem(GA_area, features = features_stack) %>%
   add_min_set_objective() %>%
   add_relative_targets(0.1) %>%
