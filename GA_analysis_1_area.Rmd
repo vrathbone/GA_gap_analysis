@@ -82,7 +82,7 @@ GA_area <- mask(GA_rast, pu)
 plot(GA_area)
 
 ### write raster
-writeRaster(GA_area, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_0.5.tif'), overwrite = TRUE)
+writeRaster(GA_area, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/GA_PU_0.5_area.tif'), overwrite = TRUE)
 
 
 GA_area_image <- as.im(GA_area)
@@ -177,7 +177,7 @@ writeRaster(geomorph_stack, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Anti
 Creating Final Conservation Feature 
 ```{r}
 ### stack all species and habitat
-features_stack <- stack(habitat_stack,turtle_stack, geomorph_stack)
+features_stack <- stack(habitat_stack, turtle_stack, geomorph_stack)
 
 ### change into a dataframe to check it
 features_df <- as.data.frame(features_stack)
@@ -332,71 +332,245 @@ plot(sprob_area_all_20,  main = c("Area- 20% All Features Targets"))
 writeRaster(sprob_area_all_20, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/ALL_area_20.tif'), overwrite = TRUE)
 ```
 
-## SCENARIO 3: Baseline - 30% target, Boundary Penalty = 0 
+## SCENARIO 3: Baseline - 30% target, Boundary Penalty = 0, 0.1 and -0.000001
 ```{r}
 ####### habitat 30% ####### 
-area_habitat_30 <- problem(GA_area, features = habitat_stack) %>%
+area_habitat_30_0 <- problem(GA_area, features = habitat_stack) %>%
   add_min_set_objective() %>%
   add_relative_targets(0.3) %>%
   add_locked_out_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0) %>% 
   add_gurobi_solver(gap = 0.1, time_limit = 1200)
 
 ## Solve problem
-sprob_area_habitat_30 <- solve(area_habitat_30)
+sprob_area_habitat_30_0 <- solve(area_habitat_30_0)
+
+#BP = 0.1
+area_habitat_30_0.1 <- problem(GA_area, features = habitat_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_out_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0.1) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_habitat_30_0.1 <- solve(area_habitat_30_0.1)
+
+#BP = 10
+area_habitat_30_10 <- problem(GA_area, features = habitat_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_out_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=10) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_habitat_30_10 <- solve(area_habitat_30_10)
+
+#BP = 100
+area_habitat_30_100 <- problem(GA_area, features = habitat_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_out_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=100) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_habitat_30_100 <- solve(area_habitat_30_100)
 
 ## Plot the solution to see what it looks like
-plot(sprob_area_habitat_30,  main = c("Area- 30% Habitat Targets"))
-plot(sprob_area_habitat_20,  main = c("Area- 20% Habitat Targets"))
-plot(sprob_area_habitat_10,  main = c("Area- 10% Habitat Targets"))
+plot(sprob_area_habitat_30_0,  main = c("Area- 30% Habitat Targets, BP = 0"))
+plot(sprob_area_habitat_30_0.1,  main = c("Area- 30% Habitat Targets, BP = 0.1"))
+plot(sprob_area_habitat_30_10,  main = c("Area- 30% Habitat Targets, BP = 10"))
+plot(sprob_area_habitat_30_100,  main = c("Area- 30% Habitat Targets, BP = 100"))
 
-writeRaster(sprob_area_habitat_30, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/habitat_area_30.tif'), overwrite = TRUE)
+writeRaster(sprob_area_habitat_30_0, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_habitat_30_0.1, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.1.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_habitat_30_10, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_10.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_habitat_30_100, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_100.tif'), overwrite = TRUE)
 
 
 ####### turtles 30% ####### 
-area_turtles_30 <- problem(GA_area, features = turtle_stack) %>%
+area_turtles_30_0 <- problem(GA_area, features = turtle_stack) %>%
   add_min_set_objective() %>%
   add_relative_targets(0.3) %>%
   add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0) %>% 
   add_gurobi_solver(gap = 0.1, time_limit = 1200)
 
 ## Solve problem
-sprob_area_turtles_30 <- solve(area_turtles_30)
+sprob_area_turtles_30_0 <- solve(area_turtles_30_0)
 
-## Plot the solution to see what it looks like
-plot(sprob_area_turtles_30,  main = c("Area- 30% Turltes Targets"))
-
-writeRaster(sprob_area_turtles_30, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/turtles_area_30.tif'), overwrite = TRUE)
-
-####### geomorphological 30% ####### 
-area_geomorph_30 <- problem(GA_area, features = geomorph_stack) %>%
+#BP = 0.1
+area_turtles_30_0.1 <- problem(GA_area, features = turtle_stack) %>%
   add_min_set_objective() %>%
   add_relative_targets(0.3) %>%
   add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0.1) %>% 
   add_gurobi_solver(gap = 0.1, time_limit = 1200)
 
 ## Solve problem
-sprob_area_geomorph_30 <- solve(area_geomorph_30)
+sprob_area_turtles_30_0.1 <- solve(area_turtles_30_0.1)
+
+#BP = 10
+area_turtles_30_10 <- problem(GA_area, features = turtle_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=10) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_turtles_30_10 <- solve(area_turtles_30_10)
+
+#BP = 100
+area_turtles_30_100 <- problem(GA_area, features = turtle_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=100) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_turtles_30_100 <- solve(area_turtles_30_100)
 
 ## Plot the solution to see what it looks like
-plot(sprob_area_geomorph_30,  main = c("Area- 30% Geomorphological Targets"))
+plot(sprob_area_turtles_30_0,  main = c("Area- 30% Turtle Targets, BP = 0"))
+plot(sprob_area_turtles_30_0.1,  main = c("Area- 30% Turtle Targets, BP = 0.1"))
+plot(sprob_area_turtles_30_10,  main = c("Area- 30% Turtle Targets, BP = 10"))
+plot(sprob_area_turtles_30_100,  main = c("Area- 30% Turtle Targets, BP = 100"))
 
-writeRaster(sprob_area_geomorph_30, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/geomorph_area_30.tif'), overwrite = TRUE)
+writeRaster(sprob_area_turtles_30_0, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_turtles_30_0.1, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.1.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_turtles_30_10, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_10.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_turtles_30_100, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_100.tif'), overwrite = TRUE)
+
+####### geomorphological 30% #######
+
+#BP = 0
+area_geomorph_30_0 <- problem(GA_area, features = geomorph_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_geomorph_30_0 <- solve(area_geomorph_30_0)
+
+#BP = 0.1
+area_geomorph_30_0.1 <- problem(GA_area, features = geomorph_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0.1) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_geomorph_30_0.1 <- solve(area_geomorph_30_0.1)
+
+#BP = 10
+area_geomorph_30_10 <- problem(GA_area, features = geomorph_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=10) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_geomorph_30_10 <- solve(area_geomorph_30_10)
+
+#BP =100
+area_geomorph_30_100 <- problem(GA_area, features = geomorph_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=100) %>% 
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_geomorph_30_100 <- solve(area_geomorph_30_100)
+
+## Plot the solution to see what it looks like
+plot(sprob_area_geomorph_30_0,  main = c("Area- 30% Geomorphological Targets, BP = 0"))
+plot(sprob_area_geomorph_30_0.1,  main = c("Area- 30% Geomorphological Targets, BP = 0.1"))
+plot(sprob_area_geomorph_30_10,  main = c("Area- 30% Geomorphological Targets, BP = 10"))
+plot(sprob_area_geomorph_30_100,  main = c("Area- 30% Geomorphological Targets, BP = 100"))
+
+writeRaster(sprob_area_geomorph_30_0, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_geomorph_30_0.1, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.1.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_geomorph_30_10, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_10.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_geomorph_30_100, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_100.tif'), overwrite = TRUE)
 
 
 ####### All features 30% ####### 
-area_all_30 <- problem(GA_area, features = features_stack) %>%
+#BP = 0
+area_all_30_0 <- problem(GA_area, features = features_stack) %>%
   add_min_set_objective() %>%
   add_relative_targets(0.3) %>%
   add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0) %>%
   add_gurobi_solver(gap = 0.1, time_limit = 1200)
 
 ## Solve problem
-sprob_area_all_30 <- solve(area_all_30)
+sprob_area_all_30_0 <- solve(area_all_30_0)
+
+#BP = 0.1
+area_all_30_0.1 <- problem(GA_area, features = features_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=0.1) %>%
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_all_30_0.1 <- solve(area_all_30_0.1)
+
+#BP = 10
+area_all_30_10 <- problem(GA_area, features = features_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=10) %>%
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_all_30_10 <- solve(area_all_30_10)
+
+#BP = 100
+area_all_30_100 <- problem(GA_area, features = features_stack) %>%
+  add_min_set_objective() %>%
+  add_relative_targets(0.3) %>%
+  add_locked_in_constraints(pa_rast) %>%
+  add_boundary_penalties(penalty=100) %>%
+  add_gurobi_solver(gap = 0.1, time_limit = 1200)
+
+## Solve problem
+sprob_area_all_30_100 <- solve(area_all_30_100)
+
 
 ## Plot the solution to see what it looks like
-plot(sprob_area_all_30,  main = c("Area- 30% All Features Targets"))
+plot(sprob_area_all_30_0,  main = c("Area- 30% All Features Targets, BP = 0"))
+plot(sprob_area_all_30_0.1,  main = c("Area- 30% All Features Targets, BP = 0.1"))
+plot(sprob_area_all_30_10,  main = c("Area- 30% All Features Targets, BP = 10"))
+plot(sprob_area_all_30_100,  main = c("Area- 30% All Features Targets, BP = 100"))
 
-writeRaster(sprob_area_all_30, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30.tif'), overwrite = TRUE)
+writeRaster(sprob_area_all_30_0, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_all_30_0.1, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_0.1.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_all_30_10, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_10.tif'), overwrite = TRUE)
+
+writeRaster(sprob_area_all_30_100, here('C:/Users/vanessa_rathbone/Dropbox/Greater_Antilles/VR files/VR Files/outputs/final_rasters/all_area_30_100.tif'), overwrite = TRUE)
 
 ```
 
